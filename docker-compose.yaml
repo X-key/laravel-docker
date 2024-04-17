@@ -25,6 +25,16 @@ services:
       - env/mysql.env
     volumes:
       - db_data:/var/lib/mysql
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: mysql
+      PMA_USER: laravel
+      PMA_PASSWORD: password
+    depends_on:
+      - mysql
   composer:
     build:
       context: dockerFiles
@@ -37,7 +47,9 @@ services:
       dockerfile: php.DockerFile
     volumes:
       - ./src:/var/www/laravel
-    entrypoint: ["php", "/var/www/laravel/artisan"]
-    command: [ "migrate" ]
+    entrypoint: [ "sh", "-c" ]
+    command: [ "sleep 20 && php /var/www/laravel/artisan migrate" ]
+    depends_on:
+      - nginx
 volumes:
   db_data:
